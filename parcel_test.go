@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -33,6 +34,7 @@ func TestAddGetDelete(t *testing.T) {
 	// prepare
 	db, err := sql.Open("sqlite", "tracker.db")
 	require.NoError(t, err)
+	defer db.Close()
 	store := NewParcelStore(db)
 	parcel := getTestParcel()
 
@@ -70,6 +72,7 @@ func TestSetAddress(t *testing.T) {
 	// prepare
 	db, err := sql.Open("sqlite", "tracker.db")
 	require.NoError(t, err)
+	defer db.Close()
 	store := NewParcelStore(db)
 	parcel := getTestParcel()
 	// add
@@ -93,7 +96,7 @@ func TestSetAddress(t *testing.T) {
 
 	p, err := store.Get(id)
 	require.NoError(t, err)
-	require.Equal(t, newAddress, p.Address)
+	assert.Equal(t, newAddress, p.Address)
 }
 
 // TestSetStatus проверяет обновление статуса
@@ -101,6 +104,7 @@ func TestSetStatus(t *testing.T) {
 	// prepare
 	db, err := sql.Open("sqlite", "tracker.db")
 	require.NoError(t, err)
+	defer db.Close()
 	store := NewParcelStore(db)
 	parcel := getTestParcel()
 	// add
@@ -123,7 +127,7 @@ func TestSetStatus(t *testing.T) {
 
 	p, err := store.Get(id)
 	require.NoError(t, err)
-	require.Equal(t, ParcelStatusSent, p.Status)
+	assert.Equal(t, ParcelStatusSent, p.Status)
 }
 
 // TestGetByClient проверяет получение посылок по идентификатору клиента
@@ -131,6 +135,7 @@ func TestGetByClient(t *testing.T) {
 	// prepare
 	db, err := sql.Open("sqlite", "tracker.db")
 	require.NoError(t, err)
+	defer db.Close()
 	store := NewParcelStore(db)
 
 	parcels := []Parcel{
@@ -166,7 +171,7 @@ func TestGetByClient(t *testing.T) {
 	// убедитесь, что количество полученных посылок совпадает с количеством добавленных
 
 	require.NoError(t, err)
-	require.Len(t, storedParcels, 3)
+	assert.Len(t, storedParcels, 3)
 
 	// check
 	for _, parcel := range storedParcels {
@@ -175,6 +180,6 @@ func TestGetByClient(t *testing.T) {
 		// убедитесь, что значения полей полученных посылок заполнены верно
 		_, ok := parcelMap[parcel.Number]
 		require.True(t, ok)
-		require.Equal(t, parcel, parcelMap[parcel.Number])
+		assert.Equal(t, parcel, parcelMap[parcel.Number])
 	}
 }
